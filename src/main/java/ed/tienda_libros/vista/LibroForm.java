@@ -2,15 +2,12 @@ package ed.tienda_libros.vista;
 
 import ed.tienda_libros.modelo.Libro;
 import ed.tienda_libros.servicio.LibroServicio;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -34,7 +31,7 @@ public class LibroForm extends JFrame {
     public LibroForm(LibroServicio libroServicio){
         this.libroServicio=libroServicio;
         iniciarForma();
-        agregarButton.addActionListener(e -> agregarLibro());
+        agregarButton.addActionListener(_ -> agregarLibro());
         tablaLibros.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -42,8 +39,8 @@ public class LibroForm extends JFrame {
                 cargarLibroSeleccionado();
             }
         });
-        modificarButton.addActionListener(e ->modificarLibro());
-        eliminarButton.addActionListener(e ->eliminarLibro());
+        modificarButton.addActionListener(_ ->modificarLibro());
+        eliminarButton.addActionListener(_ ->eliminarLibro());
     }
 
     private void iniciarForma(){
@@ -57,24 +54,25 @@ public class LibroForm extends JFrame {
         int y = (tamanioPantalla.width - getWidth()/ 2);
         setLocation(x, y);
     }
-    private void agregarLibro(){
-        //Leer valores del formulario
-        if(libroTexto.getText().equals("")){
-            mostrarMensaje("Proporciona el nombre del libro");
+    private void agregarLibro() {
+        // Leer los valores del formulario
+        if (libroTexto.getText().isEmpty()) {
+            mostrarMensaje("Proporciona el nombre del Libro");
             libroTexto.requestFocusInWindow();
             return;
         }
         var nombreLibro = libroTexto.getText();
         var autor = autorTexto.getText();
         var precio = Double.parseDouble(precioTexto.getText());
-        var existencias= Integer.parseInt(existenciasTexto.getText());
+        var existencias = Integer.parseInt(existenciasTexto.getText());
+        // Crear el objeto libro
         var libro = new Libro(null, nombreLibro, autor, precio, existencias);
 //        libro.setNombreLibro(nombreLibro);
 //        libro.setAutor(autor);
 //        libro.setPrecio(precio);
 //        libro.setExistencias(existencias);
         this.libroServicio.guardarLibro(libro);
-        mostrarMensaje("Se agrego el libro...");
+        mostrarMensaje("Se agrego el Libro...");
         limpiarFormulario();
         listarLibros();
     }
@@ -95,11 +93,11 @@ public class LibroForm extends JFrame {
         }
     }
     private void modificarLibro(){
-        if(this.idTexto.getText().equals("")){
+        if(this.idTexto.getText().isEmpty()){
             mostrarMensaje("Debe seleccionar un registro...");
         }else{
             //Verificar que el nombre del libro no sea nulo
-            if(libroTexto.getText().equals("")){
+            if(libroTexto.getText().isEmpty()){
                 mostrarMensaje("Selecciona un libro...");
                 libroTexto.requestFocusInWindow();
                 return;
@@ -157,6 +155,8 @@ public class LibroForm extends JFrame {
         this.tablaModeloLibros.setColumnIdentifiers(cabeceros);
         //Instanciar el objeto JTable
         this.tablaLibros = new JTable(tablaModeloLibros);
+        //Evitar que se seleccione varios registros de la tabla
+        tablaLibros.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         listarLibros();
     }
 
